@@ -1,0 +1,24 @@
+[
+  {
+    "uid": "ADwxQJAKaAUQeWwOF5JwS9RDYmm2",
+    "email": "u@gmail.com",
+    "name": "madhu",
+    "createdAt": "2026-10-04T11:47:54.502Z",
+    "lastLogin": null,
+    "lastActive": "2026-10-04T11:47:54.847Z",
+    "loginCount": 0,
+    "provider": "password",
+    "isAdmin": false
+  },
+  {
+    "uid": "PXBlBxOHG4PKtcJcXcxYu4l3SI22",
+    "email": "samanthameghanaanusuri@gmail.com",
+    "name": "meghana",
+    "createdAt": "2026-10-05T06:01:48.478Z",
+    "lastLogin": null,
+    "lastActive": "2026-10-05T08:57:35.922Z",
+    "loginCount": 0,
+    "provider": "password",
+    "isAdmin": false
+  }
+]

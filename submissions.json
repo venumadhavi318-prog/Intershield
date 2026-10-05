@@ -1,0 +1,38 @@
+[
+  {
+    "id": "bd8bab38-e8f5-43b3-83f1-116953a081db",
+    "uid": "PXBlBxOHG4PKtcJcXcxYu4l3SI22",
+    "studentName": "samanthameghanaanusuri",
+    "studentEmail": "samanthameghanaanusuri@gmail.com",
+    "title": "webdevelopment",
+    "company": "wordpress",
+    "link": "https//web.com",
+    "level": "LOW",
+    "score": 23,
+    "result": {
+      "score": 23,
+      "level": "LOW",
+      "signals": [
+        {
+          "points": 8,
+          "label": "Limited job details",
+          "detail": "The internship description contains very little information."
+        },
+        {
+          "points": 7,
+          "label": "Unclear link format",
+          "detail": "The supplied link does not look like a normal HTTP/HTTPS URL."
+        },
+        {
+          "points": 8,
+          "label": "Free email address",
+          "detail": "A free mailbox can be legitimate, but an official company domain is easier to verify."
+        }
+      ],
+      "advice": "No major warning signals were detected by this basic checker. This is not proof that the internship is genuine; verify the organization independently.",
+      "checkedAt": "2026-10-05T06:18:41.605Z",
+      "disclaimer": "This tool provides a risk assessment, not a legal or definitive determination that an internship is fake."
+    },
+    "createdAt": "2026-10-05T06:18:41.606Z"
+  }
+]

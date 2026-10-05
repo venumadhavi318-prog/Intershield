@@ -1,0 +1,272 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="InternShield helps students verify internship opportunities before they apply, share personal information, or pay fees.">
+<meta name="theme-color" content="#0b1020">
+<title>InternShield — Internship Risk Checker</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<a class="skipLink" href="#checker">Skip to internship checker</a>
+
+<header class="nav">
+  <a class="brand" href="#home" aria-label="InternShield home">Intern<span>Shield</span></a>
+  <button id="menuBtn" class="menuBtn" aria-expanded="false" aria-controls="primaryNav" aria-label="Toggle navigation menu">
+    <span class="menuBars" aria-hidden="true"><i></i><i></i><i></i></span>
+  </button>
+  <nav id="primaryNav" class="navLinks" aria-label="Primary">
+    <a href="#home">Home</a>
+    <a href="#how">How it works</a>
+    <a href="#checks">What we check</a>
+    <a href="#checker">Check Offer</a>
+    <a id="historyLink" href="/history.html" hidden>My checks</a>
+    <button id="loginBtn" class="ghost">Login</button>
+  </nav>
+</header>
+
+<main>
+<!-- ============ HERO ============ -->
+<section id="home" class="hero assignment-hero" aria-labelledby="heroTitle">
+  <div class="heroPin" id="heroPin">
+    <div class="heroCopy">
+      <p class="eyebrow eyebrowWide heroReveal">INTERNSHIP SAFETY</p>
+      <h1 id="heroTitle" class="heroTitle">
+        <span class="titleLine heroReveal">INTERNSHIP SAFETY,</span>
+        <span class="titleLine accentLine heroReveal">REIMAGINED</span>
+      </h1>
+      <p class="heroText heroReveal">Verify internship opportunities before you apply, share personal information, or pay fees.</p>
+      <div class="heroActions heroReveal">
+        <a class="primary btnLg" href="#checker">Check an Internship</a>
+        <a class="ghost btnLg heroGhost" href="#how">Explore How It Works</a>
+      </div>
+      <ul class="trustRow heroReveal" aria-label="Product notes">
+        <li>No API key required</li>
+        <li>Transparent rule-based scoring</li>
+        <li>Private by default</li>
+      </ul>
+    </div>
+
+    <div class="heroVisualWrap">
+      <div class="heroVisual" id="heroVisual" role="img" aria-label="InternShield protection shield analysing an internship offer">
+        <div class="visualGlow" aria-hidden="true"></div>
+        <div class="shieldRings" aria-hidden="true">
+          <span class="ring ringA"></span>
+          <span class="ring ringB"></span>
+        </div>
+        <div class="shieldCore">
+          <svg class="shieldSvg" viewBox="0 0 128 150" aria-hidden="true" focusable="false">
+            <defs>
+              <linearGradient id="shieldGrad" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0" stop-color="#6366f1"/>
+                <stop offset="0.55" stop-color="#7c5cf6"/>
+                <stop offset="1" stop-color="#8b5cf6"/>
+              </linearGradient>
+              <linearGradient id="shieldEdge" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0" stop-color="#ffffff" stop-opacity="0.55"/>
+                <stop offset="1" stop-color="#ffffff" stop-opacity="0.05"/>
+              </linearGradient>
+            </defs>
+            <path d="M64 6 L112 26 V70 C112 106 90 130 64 144 C38 130 16 106 16 70 V26 Z" fill="url(#shieldGrad)"/>
+            <path d="M64 6 L112 26 V70 C112 106 90 130 64 144 C38 130 16 106 16 70 V26 Z" fill="none" stroke="url(#shieldEdge)" stroke-width="2"/>
+            <path d="M40 74 L57 91 L89 55" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="floatChip chipOne"><span class="chipDot dotWarn" aria-hidden="true"></span>Payment request</div>
+        <div class="floatChip chipTwo"><span class="chipDot dotOk" aria-hidden="true"></span>Company verified</div>
+        <div class="floatChip chipThree"><span class="chipDot dotInfo" aria-hidden="true"></span>Recruiter check</div>
+      </div>
+    </div>
+  </div>
+  <p class="scrollHint" aria-hidden="true"><span class="scrollHintDot"></span>Scroll to see the shield move</p>
+</section>
+
+<!-- ============ STATISTICS ============ -->
+<section id="stats" class="statsSection" aria-labelledby="statsTitle">
+  <div class="statsHead">
+    <p class="eyebrow">AT A GLANCE</p>
+    <h2 id="statsTitle">Built to surface risk signals fast</h2>
+  </div>
+  <div class="impactStats" role="list">
+    <article class="impactStat" role="listitem" aria-label="95 percent risk signals analyzed">
+      <strong aria-hidden="true"><span class="statNumber" data-target="95">95</span><span class="statSuffix">%</span></strong>
+      <span class="statLabel" aria-hidden="true">Risk Signals Analyzed</span>
+    </article>
+    <article class="impactStat" role="listitem" aria-label="12 plus verification checks">
+      <strong aria-hidden="true"><span class="statNumber" data-target="12">12</span><span class="statSuffix">+</span></strong>
+      <span class="statLabel" aria-hidden="true">Verification Checks</span>
+    </article>
+    <article class="impactStat" role="listitem" aria-label="24 by 7 student protection">
+      <strong aria-hidden="true"><span class="statNumber" data-target="24">24</span><span class="statSuffix">/7</span></strong>
+      <span class="statLabel" aria-hidden="true">Student Protection</span>
+    </article>
+  </div>
+  <p class="metricNote">Product demo metrics — illustrative values for this project, not verified real-world InternShield results.</p>
+</section>
+
+<!-- ============ SCROLL STORY ============ -->
+<section id="scrollStory" class="scrollStory" aria-labelledby="storyTitle">
+  <div class="scrollStoryInner" id="storyInner">
+    <div class="scrollCopy">
+      <p class="eyebrow">SCROLL-DRIVEN VERIFICATION</p>
+      <h2 id="storyTitle">Every scroll reveals another signal.</h2>
+      <p>Scroll down to move the shield through the verification journey. The motion is controlled by your scroll position rather than autoplay.</p>
+      <ol class="storySteps">
+        <li class="scrollStep" data-step="1">
+          <b>01 — DISCOVER</b>
+          <span>Paste or submit an internship opportunity.</span>
+        </li>
+        <li class="scrollStep" data-step="2">
+          <b>02 — ANALYZE</b>
+          <span>InternShield checks available signals and identifies suspicious patterns.</span>
+        </li>
+        <li class="scrollStep" data-step="3">
+          <b>03 — VERIFY</b>
+          <span>Review the result before deciding whether to proceed.</span>
+        </li>
+      </ol>
+    </div>
+    <div class="scrollStage" aria-hidden="true">
+      <div class="scrollOrb" id="scrollOrb">
+        <svg viewBox="0 0 128 150" class="orbSvg" aria-hidden="true" focusable="false">
+          <path d="M64 6 L112 26 V70 C112 106 90 130 64 144 C38 130 16 106 16 70 V26 Z" fill="#ffffff" fill-opacity="0.14" stroke="#ffffff" stroke-opacity="0.4" stroke-width="2"/>
+          <path d="M40 74 L57 91 L89 55" fill="none" stroke="#ffffff" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="orbit orbitA"></div>
+      <div class="orbit orbitB"></div>
+      <div class="scrollSignal signalA">PAYMENT</div>
+      <div class="scrollSignal signalB">CONTACT</div>
+      <div class="scrollSignal signalC">COMPANY</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ HOW IT WORKS ============ -->
+<section id="how" class="section" aria-labelledby="howTitle">
+  <div class="sectionHead">
+    <div>
+      <p class="eyebrow">HOW IT WORKS</p>
+      <h2 id="howTitle">Three simple steps</h2>
+    </div>
+    <span class="tag">Runs without paid API keys</span>
+  </div>
+  <div class="steps">
+    <article class="revealCard">
+      <b>STEP 01</b>
+      <h3>Discover</h3>
+      <p>Submit the internship opportunity along with any available company, recruiter, and contact details.</p>
+    </article>
+    <article class="revealCard">
+      <b>STEP 02</b>
+      <h3>Analyze</h3>
+      <p>InternShield evaluates the offer against transparent, rule-based risk indicators and explains every signal it detects.</p>
+    </article>
+    <article class="revealCard">
+      <b>STEP 03</b>
+      <h3>Verify</h3>
+      <p>Review the assessment and the recommended checklist, then verify the organization independently before you proceed.</p>
+    </article>
+  </div>
+</section>
+
+<!-- ============ RISK SIGNALS / CHECKS ============ -->
+<section id="checks" class="section soft" aria-labelledby="checksTitle">
+  <p class="eyebrow">RISK SIGNAL LIBRARY</p>
+  <h2 id="checksTitle">What InternShield checks for</h2>
+  <p class="sectionLead">The checker is transparent by design. These are the signal categories it looks for in the offer text you submit.</p>
+  <div class="checkGrid">
+    <article class="checkCard revealCard"><h3>Payment requests</h3><p>Registration, processing, training, or security fees, and any request for money.</p></article>
+    <article class="checkCard revealCard"><h3>Unrealistic promises</h3><p>Guaranteed jobs, instant selection, or unrealistic earnings claims.</p></article>
+    <article class="checkCard revealCard"><h3>Informal contact channels</h3><p>Offers that rely only on WhatsApp or Telegram instead of a verifiable company channel.</p></article>
+    <article class="checkCard revealCard"><h3>Pressure language</h3><p>Urgency and scarcity wording that discourages independent verification.</p></article>
+    <article class="checkCard revealCard"><h3>Free email addresses</h3><p>Contact details that use a free mailbox rather than an official company domain.</p></article>
+    <article class="checkCard revealCard"><h3>Sensitive information requests</h3><p>Requests for OTPs, passwords, bank, or card details — a strong warning signal.</p></article>
+  </div>
+</section>
+
+<!-- ============ CALL TO ACTION ============ -->
+<section class="ctaBand" aria-labelledby="ctaTitle">
+  <div class="ctaInner revealCard">
+    <div>
+      <p class="eyebrow">READY WHEN YOU ARE</p>
+      <h2 id="ctaTitle">Check an internship before you commit.</h2>
+      <p>Paste the offer you received and review the risk signals in seconds.</p>
+    </div>
+    <a class="primary btnLg" href="#checker">Check an Internship</a>
+  </div>
+</section>
+
+<!-- ============ CHECKER (existing functionality) ============ -->
+<section id="checker" class="section" aria-labelledby="checkerTitle">
+  <div class="sectionHead">
+    <div>
+      <p class="eyebrow">OFFER CHECKER</p>
+      <h2 id="checkerTitle">Analyze an internship</h2>
+    </div>
+    <span class="tag">No API key required</span>
+  </div>
+  <div class="grid">
+    <form id="checkerForm" class="panel">
+      <label for="title">Internship title<input id="title" required placeholder="e.g. Web Development Intern"></label>
+      <label for="company">Company name<input id="company" placeholder="e.g. Example Technologies"></label>
+      <label for="contact">Company / recruiter contact<input id="contact" placeholder="email or contact details"></label>
+      <label for="link">Website or job link<input id="link" placeholder="https://example.com/careers"></label>
+      <label for="description">Offer description<textarea id="description" required rows="8" placeholder="Paste the internship message, offer letter text, or job description here..."></textarea></label>
+      <button class="primary full" type="submit">Analyze offer</button>
+      <p id="formMsg" class="msg" role="status" aria-live="polite"></p>
+    </form>
+
+    <div id="result" class="panel result empty">
+      <div class="resultIcon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="46" height="46" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M16.5 16.5 21 21"/></svg>
+      </div>
+      <h3>Your result will appear here</h3>
+      <p>We'll look for common warning signals and explain what to verify.</p>
+    </div>
+  </div>
+</section>
+</main>
+
+<!-- ============ AUTH MODAL ============ -->
+<div id="authModal" class="modal hidden">
+  <div class="modalBox" role="dialog" aria-modal="true" aria-labelledby="authTitle">
+    <button class="close" data-close aria-label="Close dialog">×</button>
+    <h2 id="authTitle">Student Login</h2>
+    <form id="authForm" novalidate>
+      <div id="nameWrap" class="hidden"><label for="authName">Full name<input id="authName" autocomplete="name"></label></div>
+      <label for="authEmail">Email<input id="authEmail" type="email" autocomplete="email" required></label>
+      <label for="authPassword">Password
+        <span class="pwWrap">
+          <input id="authPassword" type="password" autocomplete="current-password" required>
+          <button type="button" class="pwToggle" data-target="authPassword" aria-label="Show password" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="eyeOpen" d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle class="eyeOpen" cx="12" cy="12" r="3"/><path class="eyeOff" d="M3 3l18 18" style="display:none"/><path class="eyeOff" d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.4 4.2M6.6 6.6A17.7 17.7 0 0 0 2 12s3.5 7 10 7a10.9 10.9 0 0 0 4.4-.9" style="display:none"/></svg>
+          </button>
+        </span>
+      </label>
+      <button class="primary full" type="submit">Continue</button>
+    </form>
+    <div id="googleSection" class="authDivider" hidden><span>or</span></div>
+    <button id="googleBtn" class="ghost full googleBtn" type="button" hidden>
+      <svg viewBox="0 0 48 48" aria-hidden="true"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+      Continue with Google
+    </button>
+    <p id="authMsg" class="msg" role="status" aria-live="polite"></p>
+    <button id="toggleAuth" class="textBtn" type="button">Create a student account</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footInner">
+    <div class="footBrand">InternShield</div>
+    <p>Built as a student safety project • Risk assessment is informational only.</p>
+  </div>
+</footer>
+
+<script src="vendor/gsap.min.js"></script>
+<script src="vendor/ScrollTrigger.min.js"></script>
+<script src="js/animations.js" defer></script>
+<script type="module" src="app-firebase.js"></script>
+</body>
+</html>

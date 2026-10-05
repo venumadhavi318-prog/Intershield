@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>My Checks — InternShield</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="nav">
+  <div class="brand">🛡️ Intern<span>Shield</span></div>
+  <div class="adminActions">
+    <a href="/">← Checker</a>
+    <button id="logoutBtn" class="ghost" type="button">Logout</button>
+  </div>
+</header>
+
+<main class="adminWrap">
+  <p class="eyebrow">STUDENT DASHBOARD</p>
+  <h1>My internship checks</h1>
+  <p id="whoami" class="muted"></p>
+  <div id="status" class="panel" role="status" aria-live="polite">Loading…</div>
+</main>
+
+<script type="module">
+import { watchAuth, logoutStudent } from "./js/firebase.js";
+import { recordLogout, startHeartbeat } from "./js/session-activity.js";
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+
+let currentUser = null, stopHeartbeat = () => {};
+
+$("logoutBtn").onclick = async () => {
+  await recordLogout(currentUser);
+  stopHeartbeat();
+  await logoutStudent();
+  location.href = "/";
+};
+
+watchAuth(async u => {
+  currentUser = u;
+  stopHeartbeat();
+  if (!u) { location.href = "/"; return; }
+
+  $("whoami").textContent = u.email ? `Signed in as ${u.email}` : "";
+  stopHeartbeat = startHeartbeat(u);
+
+  const status = $("status");
+  try {
+    const token = await u.getIdToken();
+    const r = await fetch("/api/my-analyses", { headers: { Authorization: `Bearer ${token}` } });
+    if (!r.ok) throw new Error("Could not load your checks. Please refresh and try again.");
+    const rows = await r.json();
+    status.innerHTML = rows.length
+      ? rows.map(x => `<div class="signal"><b>${esc(x.company || "Unknown company")} — <span class="risk ${String(x.level).toLowerCase()}">${esc(x.level)} (${esc(x.score)}/100)</span></b><span>${esc(x.title || "Internship")} · ${new Date(x.createdAt).toLocaleString()}</span></div>`).join("")
+      : "No saved checks yet. Run a check on the checker page to build your history.";
+  } catch (e) {
+    status.textContent = e.message;
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>InternShield Admin</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<!-- Administrator sign-in gate. Standard username + password only: no Google
+     or other single sign-on, and no fast-pass. Shown until an admin session is
+     confirmed by the server-verified role check in the script below. -->
+<section id="adminLogin" class="adminGate">
+  <form id="adminLoginForm" class="modalBox adminLoginBox" novalidate>
+    <p class="eyebrow">RESTRICTED AREA</p>
+    <h1 class="gateTitle">Administrator sign in</h1>
+    <p class="gateHint">Enter your administrator username and password. Single sign-on is not available for this account.</p>
+
+    <label for="adminEmail">Username (email)
+      <input id="adminEmail" type="email" autocomplete="username" required>
+    </label>
+
+    <label for="adminPassword">Password
+      <span class="pwWrap">
+        <input id="adminPassword" type="password" autocomplete="current-password" required>
+        <button type="button" class="pwToggle" data-target="adminPassword" aria-label="Show password" aria-pressed="false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="eyeOpen" d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle class="eyeOpen" cx="12" cy="12" r="3"/><path class="eyeOff" d="M3 3l18 18" style="display:none"/><path class="eyeOff" d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a17.6 17.6 0 0 1-3.4 4.2M6.6 6.6A17.7 17.7 0 0 0 2 12s3.5 7 10 7a10.9 10.9 0 0 0 4.4-.9" style="display:none"/></svg>
+        </button>
+      </span>
+    </label>
+
+    <button class="primary full" type="submit">Sign in</button>
+    <p id="adminLoginMsg" class="msg" role="status" aria-live="polite"></p>
+    <a href="#" id="adminRecover" class="recoverLink">Forgot your password? Recover it securely</a>
+    <a href="/" class="gateBack">← Back to site</a>
+  </form>
+</section>
+
+<div id="adminDashboard" class="hidden">
+<header class="nav">
+  <div class="brand">🛡️ Intern<span>Shield</span> <small>ADMIN</small></div>
+  <div class="adminActions">
+    <a href="/">← Back to site</a>
+    <button id="adminLogout" class="ghost" type="button">Logout</button>
+  </div>
+</header>
+
+<main class="adminWrap">
+  <div class="sectionHead">
+    <div><p class="eyebrow">ADMIN CONSOLE</p><h1>Users &amp; risk monitoring</h1></div>
+    <button id="refresh" class="ghost" type="button">Refresh</button>
+  </div>
+
+  <p id="adminMsg" class="msg" role="status" aria-live="polite"></p>
+
+  <div class="stats" id="stats">
+    <div><small>Total users</small><strong id="usersTotal">—</strong></div>
+    <div><small>Online now</small><strong id="usersOnline">—</strong></div>
+    <div><small>Offline</small><strong id="usersOffline">—</strong></div>
+    <div><small>Active today</small><strong id="usersActiveToday">—</strong></div>
+    <div><small>Logins today</small><strong id="loginsToday">—</strong></div>
+    <div><small>Total checks</small><strong id="total">—</strong></div>
+    <div><small>High risk</small><strong id="high">—</strong></div>
+    <div><small>Medium risk</small><strong id="medium">—</strong></div>
+    <div><small>Low risk</small><strong id="low">—</strong></div>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Dashboard sections">
+    <button class="tab isActive" role="tab" aria-selected="true" data-tab="users">Users</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="activity">Login activity</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="checks">Recent checks</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="admins">Admins</button>
+  </div>
+
+  <section id="panel-users" class="panel tabPanel">
+    <div class="panelHead">
+      <h2>Users</h2>
+      <input id="userSearch" class="search" type="search" placeholder="Search by name or email…" aria-label="Search users by name or email" autocomplete="off">
+    </div>
+    <div id="usersTable">Loading…</div>
+  </section>
+
+  <section id="panel-activity" class="panel tabPanel hidden">
+    <div class="panelHead"><h2>Login activity</h2></div>
+    <div id="activityTable">Loading…</div>
+  </section>
+
+  <section id="panel-checks" class="panel tabPanel hidden">
+    <div class="panelHead"><h2>Recent analyses</h2></div>
+    <div id="table">Loading…</div>
+  </section>
+
+  <section id="panel-admins" class="panel tabPanel hidden">
+    <div class="panelHead"><h2>Administrator accounts</h2></div>
+    <div id="adminsTable">Loading…</div>
+  </section>
+</main>
+</div><!-- /#adminDashboard -->
+
+<script type="module">
+import {
+  watchAuth, logoutStudent, loginStudent, isValidEmail,
+  authErrorMessage, sendPasswordReset
+} from "./js/firebase.js";
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, m => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[m]));
+
+const ADMIN_KEY = "internshield.adminToken";
+let token = null;
+let localAdmin = false; // true when signed in with the standard .env credential
+let users = [], activity = [], checks = [], admins = [];
+
+/* ---- formatting -------------------------------------------------- */
+function fmtAbsolute(iso) {
+  if (!iso) return "—";
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? "—" : d.toLocaleString();
+}
+function fmtRelative(iso) {
+  if (!iso) return "never";
+  const t = new Date(iso).getTime();
+  if (isNaN(t)) return "never";
+  const secs = Math.round((Date.now() - t) / 1000);
+  if (secs < 60) return "just now";
+  const mins = Math.round(secs / 60);
+  if (mins < 60) return `${mins} min ago`;
+  const hrs = Math.round(mins / 60);
+  if (hrs < 24) return `${hrs} hr ago`;
+  const days = Math.round(hrs / 24);
+  return `${days} day${days === 1 ? "" : "s"} ago`;
+}
+function statusBadge(online) {
+  return online
+    ? '<span class="presence online"><i></i>Online</span>'
+    : '<span class="presence offline"><i></i>Offline</span>';
+}
+
+/* ---- gate / dashboard visibility --------------------------------- */
+function showGate(message) {
+  $("adminDashboard").classList.add("hidden");
+  $("adminLogin").classList.remove("hidden");
+  if (message) {
+    $("adminLoginMsg").classList.remove("ok");
+    $("adminLoginMsg").textContent = message;
+  }
+  const email = $("adminEmail");
+  if (email && !email.value) email.focus();
+}
+function showDashboard() {
+  $("adminLogin").classList.add("hidden");
+  $("adminDashboard").classList.remove("hidden");
+}
+
+/* ---- auth guard (server-verified role) --------------------------- */
+async function guard() {
+  // 1) A standard administrator session (email + password from the server .env)
+  //    is validated against the server before anything is shown.
+  const stored = localStorage.getItem(ADMIN_KEY);
+  if (stored) {
+    token = stored;
+    try {
+      const r = await fetch("/api/auth/admin-session", { headers: { Authorization: `Bearer ${token}` } });
+      if (r.ok) { localAdmin = true; showDashboard(); return true; }
+    } catch { /* fall through */ }
+    localStorage.removeItem(ADMIN_KEY);
+    token = null;
+  }
+
+  // 2) Otherwise fall back to a Firebase admin (email listed in ADMIN_EMAILS).
+  localAdmin = false;
+  const user = window.__user;
+  if (!user) { showGate(); return false; }
+  token = await user.getIdToken();
+  let session;
+  try {
+    const r = await fetch("/api/auth/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ event: null, name: user.displayName || "" })
+    });
+    if (!r.ok) { showGate("Could not verify your session. Please sign in again."); return false; }
+    session = await r.json();
+  } catch { showGate("Could not verify your session. Please sign in again."); return false; }
+  if (!session || session.role !== "admin") {
+    // A signed-in non-admin must not reach the console. Clear the standard
+    // student session and require a manual administrator sign-in below.
+    try { await logoutStudent(); } catch { /* ignore */ }
+    showGate("Access denied — this account is not an administrator. Sign in with an administrator account.");
+    return false;
+  }
+  showDashboard();
+  return true;
+}
+
+// Try the standard (non-SSO) administrator credential configured on the server.
+// Returns { ok:true, token } on success, otherwise { ok:false } so the caller can
+// fall back to a Firebase administrator account.
+async function tryStandardAdmin(email, password) {
+  try {
+    const r = await fetch("/api/auth/admin-login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password })
+    });
+    if (r.ok) {
+      const d = await r.json();
+      if (d && d.token) return { ok: true, token: d.token };
+    }
+  } catch { /* fall through */ }
+  return { ok: false };
+}
+
+async function api(path) {
+  const r = await fetch(path, { headers: { Authorization: `Bearer ${token}` } });
+  if (r.status === 401 || r.status === 403) {
+    // The session expired or was revoked — return to the sign-in gate.
+    if (localAdmin) { localStorage.removeItem(ADMIN_KEY); localAdmin = false; }
+    token = null;
+    showGate("Your session has expired. Please sign in again.");
+    throw new Error("Session expired");
+  }
+  if (!r.ok) throw new Error(`Request failed (${r.status})`);
+  return r.json();
+}
+
+/* ---- render ------------------------------------------------------ */
+function renderStats(s) {
+  ["total", "high", "medium", "low", "usersTotal", "usersOnline", "usersOffline", "usersActiveToday", "loginsToday"]
+    .forEach(k => { if ($(k)) $(k).textContent = (s && s[k] != null) ? s[k] : "0"; });
+}
+
+function renderUsers() {
+  const q = ($("userSearch").value || "").trim().toLowerCase();
+  const rows = q
+    ? users.filter(u => (u.name || "").toLowerCase().includes(q) || (u.email || "").toLowerCase().includes(q))
+    : users;
+  if (!users.length) { $("usersTable").innerHTML = '<p class="empty">No users yet.</p>'; return; }
+  if (!rows.length) { $("usersTable").innerHTML = `<p class="empty">No users match “${esc(q)}”.</p>`; return; }
+  $("usersTable").innerHTML = `
+    <div class="table">
+      <div class="tr th usersRow"><span>Name</span><span>Email</span><span>Status</span><span>Last active</span><span>Last login</span><span>Logins</span><span>Provider</span></div>
+      ${rows.map(u => `
+        <div class="tr usersRow">
+          <span>${u.name ? esc(u.name) : '<em class="muted">—</em>'}${u.isAdmin ? ' <small class="tag">admin</small>' : ''}</span>
+          <span>${esc(u.email)}</span>
+          <span>${statusBadge(u.online)}</span>
+          <span title="${esc(fmtAbsolute(u.lastActive))}">${esc(fmtRelative(u.lastActive))}</span>
+          <span title="${esc(fmtAbsolute(u.lastLogin))}">${esc(fmtRelative(u.lastLogin))}</span>
+          <span>${u.loginCount || 0}</span>
+          <span>${esc(u.provider || "password")}</span>
+        </div>`).join("")}
+    </div>`;
+}
+
+function renderActivity() {
+  if (!activity.length) { $("activityTable").innerHTML = '<p class="empty">No login activity yet.</p>'; return; }
+  const icon = { login: "🔓", logout: "🔒", signup: "✨" };
+  $("activityTable").innerHTML = `
+    <div class="table">
+      <div class="tr th activityRow"><span>Who</span><span>Action</span><span>Detail</span><span>When</span></div>
+      ${activity.slice(0, 100).map(a => `
+        <div class="tr activityRow">
+          <span>${esc(a.name || a.email || "Unknown")}<br><small class="muted">${esc(a.email || "")}</small></span>
+          <span>${icon[a.type] || "•"} ${esc(a.type)}</span>
+          <span>${esc(a.detail || "")}</span>
+          <span title="${esc(fmtAbsolute(a.at))}">${esc(fmtRelative(a.at))}</span>
+        </div>`).join("")}
+    </div>`;
+}
+
+function renderChecks() {
+  if (!checks.length) { $("table").innerHTML = '<p class="empty">No analyses yet.</p>'; return; }
+  $("table").innerHTML = `
+    <div class="table">
+      <div class="tr th checksRow"><span>Date</span><span>Company</span><span>Offer</span><span>Risk</span></div>
+      ${checks.slice(0, 50).map(x => `
+        <div class="tr checksRow">
+          <span title="${esc(fmtAbsolute(x.createdAt))}">${esc(fmtRelative(x.createdAt))}</span>
+          <span>${esc(x.company || "—")}</span>
+          <span>${esc(x.title || "—")}</span>
+          <span class="risk ${String(x.level).toLowerCase()}">${esc(x.level)} · ${esc(x.score)}</span>
+        </div>`).join("")}
+    </div>`;
+}
+
+function renderAdmins() {
+  if (!admins.length) { $("adminsTable").innerHTML = '<p class="empty">No administrator accounts configured.</p>'; return; }
+  $("adminsTable").innerHTML = `
+    <div class="table">
+      <div class="tr th adminsRow"><span>Email</span><span>Registered in Firebase</span><span>Last login</span></div>
+      ${admins.map(a => `
+        <div class="tr adminsRow">
+          <span>${esc(a.email)}</span>
+          <span>${a.registered ? '<span class="presence online"><i></i>Yes</span>' : '<span class="presence offline"><i></i>Not yet</span>'}</span>
+          <span>${esc(a.lastLogin ? fmtRelative(a.lastLogin) : "—")}</span>
+        </div>`).join("")}
+    </div>`;
+}
+
+/* ---- load -------------------------------------------------------- */
+let loading = false;
+async function load() {
+  if (loading) return;
+  loading = true;
+  try {
+    const ok = await guard();
+    if (!ok) return;
+    $("adminMsg").textContent = "";
+    try {
+      const [stats, u, a, c, ad] = await Promise.all([
+        api("/api/admin/stats"),
+        api("/api/admin/users"),
+        api("/api/admin/activity"),
+        api("/api/admin/submissions"),
+        api("/api/admin/admins")
+      ]);
+      users = u; activity = a; checks = c; admins = ad;
+      renderStats(stats);
+      renderUsers(); renderActivity(); renderChecks(); renderAdmins();
+    } catch (err) {
+      $("adminMsg").textContent = "Could not load dashboard data. " + err.message;
+    }
+  } finally {
+    loading = false;
+  }
+}
+
+/* ---- tabs -------------------------------------------------------- */
+document.querySelectorAll(".tab").forEach(tab => {
+  tab.addEventListener("click", () => {
+    document.querySelectorAll(".tab").forEach(t => { t.classList.remove("isActive"); t.setAttribute("aria-selected", "false"); });
+    tab.classList.add("isActive");
+    tab.setAttribute("aria-selected", "true");
+    document.querySelectorAll(".tabPanel").forEach(p => p.classList.add("hidden"));
+    const panel = $("panel-" + tab.dataset.tab);
+    if (panel) panel.classList.remove("hidden");
+  });
+});
+
+$("userSearch").addEventListener("input", renderUsers);
+$("refresh").onclick = load;
+$("adminLogout").onclick = async () => {
+  if (localAdmin && token) {
+    try { await fetch("/api/auth/admin-logout", { method: "POST", headers: { Authorization: `Bearer ${token}` } }); } catch { /* ignore */ }
+    localStorage.removeItem(ADMIN_KEY);
+    localAdmin = false;
+    token = null;
+    showGate("You have been signed out.");
+    return;
+  }
+  await logoutStudent();
+  showGate("You have been signed out.");
+};
+
+/* ---- administrator sign-in (standard username + password) -------- */
+$("adminLoginForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const msg = $("adminLoginMsg");
+  const email = $("adminEmail").value.trim();
+  const password = $("adminPassword").value;
+  msg.classList.remove("ok");
+
+  if (!isValidEmail(email)) { msg.textContent = "Please enter a valid administrator email."; return; }
+  if (!password) { msg.textContent = "Please enter your password."; return; }
+
+  const submit = e.target.querySelector('button[type="submit"]');
+  submit.disabled = true;
+  msg.textContent = "Signing in…";
+  try {
+    // Standard credentials configured on the server (.env) are tried first.
+    const std = await tryStandardAdmin(email, password);
+    if (std.ok) {
+      localStorage.setItem(ADMIN_KEY, std.token);
+      token = std.token;
+      localAdmin = true;
+      $("adminPassword").value = "";
+      msg.textContent = "";
+      showDashboard();
+      load();
+      return;
+    }
+    // Otherwise fall back to a Firebase administrator account.
+    const user = await loginStudent(email, password);
+    token = await user.getIdToken();
+    const r = await fetch("/api/auth/session", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ event: "login", name: user.displayName || "" })
+    });
+    if (!r.ok) { msg.textContent = "Sign-in could not be verified. Please try again."; await logoutStudent(); return; }
+    const session = await r.json();
+    if (!session || session.role !== "admin") {
+      await logoutStudent();
+      token = null;
+      msg.textContent = "Access denied — this account is not an administrator.";
+      return;
+    }
+    $("adminPassword").value = "";
+    msg.textContent = "";
+    showDashboard();
+    load();
+  } catch (err) {
+    msg.textContent = authErrorMessage(err);
+  } finally {
+    submit.disabled = false;
+  }
+});
+
+/* ---- secure password recovery ------------------------------------ */
+$("adminRecover").addEventListener("click", async e => {
+  e.preventDefault();
+  const msg = $("adminLoginMsg");
+  msg.classList.remove("ok");
+  const email = ($("adminEmail").value || "").trim();
+  if (!isValidEmail(email)) {
+    msg.textContent = "Enter your administrator email above, then click “Recover it securely”.";
+    $("adminEmail").focus();
+    return;
+  }
+  try {
+    await sendPasswordReset(email);
+  } catch { /* fall through to the generic message */ }
+  // Always generic: never reveal whether the address is registered.
+  msg.classList.add("ok");
+  msg.textContent = `If an administrator account exists for ${email}, a secure password reset link has been sent. Check your inbox.`;
+});
+
+/* ---- show / hide password (single password field) ---------------- */
+document.querySelectorAll(".pwToggle").forEach(btn => {
+  btn.addEventListener("click", () => {
+    const input = $(btn.dataset.target);
+    if (!input) return;
+    const show = input.type === "password";
+    input.type = show ? "text" : "password";
+    btn.setAttribute("aria-label", show ? "Hide password" : "Show password");
+    btn.setAttribute("aria-pressed", String(show));
+    btn.querySelectorAll(".eyeOpen").forEach(el => el.style.display = show ? "none" : "");
+    btn.querySelectorAll(".eyeOff").forEach(el => el.style.display = show ? "" : "none");
+  });
+});
+
+watchAuth(user => {
+  window.__user = user;
+  if (user) { load(); return; }
+  // No Firebase user: a stored standard administrator session can still open
+  // the console. Otherwise show the sign-in gate.
+  if (localStorage.getItem(ADMIN_KEY)) { load(); return; }
+  showGate();
+});
+</script>
+</body>
+</html>

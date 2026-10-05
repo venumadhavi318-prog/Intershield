@@ -1,0 +1,20 @@
+[
+  {
+    "id": "eefdc50a-f49c-43e6-8d03-55e49cead9ec",
+    "uid": "PXBlBxOHG4PKtcJcXcxYu4l3SI22",
+    "email": "samanthameghanaanusuri@gmail.com",
+    "name": "meghana",
+    "type": "signup",
+    "detail": "Created a student account",
+    "at": "2026-10-05T06:01:51.548Z"
+  },
+  {
+    "id": "b49463b1-541e-4044-90bf-ec44788d2cc3",
+    "uid": "ADwxQJAKaAUQeWwOF5JwS9RDYmm2",
+    "email": "u@gmail.com",
+    "name": "madhu",
+    "type": "logout",
+    "detail": "Signed out",
+    "at": "2026-10-04T11:48:17.662Z"
+  }
+]
