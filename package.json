@@ -2,15 +2,11 @@
   "name": "internshield",
   "version": "1.0.0",
   "private": true,
-  "description": "InternShield — internship-scam checker (Express backend + Firebase Authentication).",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js"
-  },
-  "engines": {
-    "node": ">=18"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
-    "express": "^4.19.2"
+    "express": "^4.21.2"
   }
 }
